@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection.PortableExecutable;
 using System.Windows.Forms;
 using TutorManager.App.Data;
 using TutorManager.App.Models;
@@ -13,6 +14,7 @@ namespace TutorManager.App.UI
         DateTimePicker dtDate;
         DataGridView grid;
         Button btnMarkAll, btnSave;
+        Panel pnlHeader;
 
         StudentRepository studentRepo = new StudentRepository();
         AttendanceRepository attRepo = new AttendanceRepository();
@@ -25,6 +27,13 @@ namespace TutorManager.App.UI
             this.Text = "Attendance";
             this.Size = new Size(950, 600);
             this.BackColor = Color.FromArgb(245, 245, 245);
+
+            pnlHeader = new Panel()
+            {
+                Dock = DockStyle.Top,
+                Height = 5,
+                BackColor = Color.ForestGreen
+            };
 
             // TOP BAR
             Panel top = new Panel()
@@ -103,6 +112,7 @@ namespace TutorManager.App.UI
 
             this.Controls.Add(grid);
             this.Controls.Add(top);
+            this.Controls.Add(pnlHeader);
 
             SetupGrid();
             LoadGrades();

@@ -16,7 +16,7 @@ namespace TutorManager.App.UI
         Button btnLoad, btnExport;
 
         Label lblFinalTotal;
-
+        Panel pnlHeader;
         DataGridView grid;
 
         StudentRepository studentRepo = new StudentRepository();
@@ -27,6 +27,13 @@ namespace TutorManager.App.UI
             this.Text = "Reports";
             this.Size = new Size(1100, 700);
             this.BackColor = Color.FromArgb(245, 247, 250);
+
+            pnlHeader = new Panel()
+            {
+                Dock = DockStyle.Top,
+                Height = 5,
+                BackColor = Color.ForestGreen
+            };
 
             // ================= TOP =================
             Panel top = new Panel()
@@ -128,6 +135,7 @@ namespace TutorManager.App.UI
             this.Controls.Add(grid);
             this.Controls.Add(bottom);
             this.Controls.Add(top);
+            this.Controls.Add(pnlHeader);
 
             LoadGrades();
             SetupGrid();
