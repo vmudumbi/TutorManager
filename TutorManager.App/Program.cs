@@ -10,12 +10,24 @@ namespace TutorManager.App
         /// </summary>
         [STAThread]
         static void Main()
-        {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
+        {   
             Db.Init();
-            Application.Run(new MainForm());
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            using (var login = new LoginForm())
+            {
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    // Only run MainForm if login returned OK
+                    Application.Run(new MainForm());
+                }
+                else
+                {
+                    // Otherwise, the app just ends here
+                    Application.Exit();
+                }
+            }
         }
     }
 }

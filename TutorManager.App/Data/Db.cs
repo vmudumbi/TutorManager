@@ -1,13 +1,18 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.VisualBasic.ApplicationServices;
+using System;
+using System.Configuration;
 using System.IO;
-using Microsoft.Data.Sqlite;
+using TutorManager.App.Utility;
 
 namespace TutorManager.App.Data
 {
     public static class Db
     {
+        private static string executableFolder = AppContext.BaseDirectory;
+
         private static string projectRoot =
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\"));
+            Path.GetFullPath(Path.Combine(executableFolder, @"..\..\..\"));
 
         private static string dbFolder =
             Path.Combine(projectRoot, "Data");
@@ -28,16 +33,24 @@ namespace TutorManager.App.Data
             if (!Directory.Exists(dbFolder))
                 Directory.CreateDirectory(dbFolder);
 
+            bool.TryParse(ConfigurationManager.AppSettings["RebuildDatabase"], out bool shouldRebuild);
+
             using var con = GetConnection();
             con.Open();
 
             var cmd = con.CreateCommand();
 
-            cmd.CommandText =
-            @"
-  --DROP TABLE IF EXISTS Students;
-  --DROP TABLE IF EXISTS Attendance;
+            string dropScript = "";
+            if (shouldRebuild)
+            {
+                dropScript = @"
+                    DROP TABLE IF EXISTS Students;
+                    DROP TABLE IF EXISTS Attendance;
+                    DROP TABLE IF EXISTS Users;";
+            }
 
+            cmd.CommandText = dropScript +
+            @"
     CREATE TABLE IF NOT EXISTS Students (
         Id INTEGER PRIMARY KEY AUTOINCREMENT,
         Name TEXT NOT NULL,
@@ -59,11 +72,31 @@ namespace TutorManager.App.Data
         HoursWorked REAL DEFAULT 1
     );
 
+     CREATE TABLE IF NOT EXISTS Users (
+        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Username TEXT NOT NULL UNIQUE,
+        Password TEXT NOT NULL,
+        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_unique
     ON Attendance(StudentId, ClassDate, BatchTime);
     ";
 
             cmd.ExecuteNonQuery();
+
+            if (shouldRebuild)
+            {
+                SeedDefaultUser(con);
+            }
+        }
+
+        private static void SeedDefaultUser(SqliteConnection con)
+        {
+            string username = "admin";
+            string plainPassword = "admin123";
+            UserRepository _userRepo = new UserRepository();
+            _userRepo.Add(username, plainPassword);
         }
     }
 }

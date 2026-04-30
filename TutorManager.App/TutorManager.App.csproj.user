@@ -1,10 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Update="UI\LogHoursForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="UI\LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="UI\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\RegisterForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="UI\ReportForm.cs">
@@ -13,7 +22,7 @@
     <Compile Update="UI\StudentForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Utilities\Spinner.cs">
+    <Compile Update="Utilities\ModernProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

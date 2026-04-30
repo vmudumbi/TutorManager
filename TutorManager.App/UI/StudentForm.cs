@@ -7,17 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TutorManager.App.Services;
 
 namespace TutorManager.App.UI
 {
     public partial class StudentForm : Form
     {
         public StudentForm()
-        {
+        {            
             InitializeComponent();
-
             this.BackColor = bodyBg; 
-
             LoadGrid();
         }
     }

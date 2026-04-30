@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TutorManager.App.Data;
 using TutorManager.App.Models;
+using TutorManager.App.Utility;
 
 namespace TutorManager.App.UI
 {
@@ -129,19 +131,84 @@ namespace TutorManager.App.UI
 
         private void LoadGrid() { grid.DataSource = null; grid.DataSource = studentrepo.GetAll(); }
 
-        private void BtnSave_Click(object sender, EventArgs e)
+
+        private async void BtnSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtName.Text)) { MessageBox.Show("Name required"); return; }
-            if (selectedStudent == null)
+            // --- 1. STRICT VALIDATION LAYER ---
+
+            // Name Check
+            if (string.IsNullOrWhiteSpace(txtName.Text))
             {
-                studentrepo.Add(new Student { Name = txtName.Text, SchoolName = txtSchool.Text, Grade = cmbGrade.Text, HourlyRate = numRate.Value, Email = txtEmail.Text, Phone = txtPhone.Text, Description = txtDescription.Text, IsActive = chkActive.Checked ? 1 : 0 });
+                ShowError("Student Name is required.", txtName); return;
             }
-            else
+
+            // Phone Check (Format: (xxx) xxx-xxxx)
+            string phonePattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
+            if (string.IsNullOrWhiteSpace(txtPhone.Text) || !Regex.IsMatch(txtPhone.Text, phonePattern))
             {
-                selectedStudent.Name = txtName.Text; selectedStudent.SchoolName = txtSchool.Text; selectedStudent.Grade = cmbGrade.Text; selectedStudent.HourlyRate = numRate.Value; selectedStudent.Email = txtEmail.Text; selectedStudent.Phone = txtPhone.Text; selectedStudent.Description = txtDescription.Text; selectedStudent.IsActive = chkActive.Checked ? 1 : 0;
-                studentrepo.Update(selectedStudent);
+                ShowError("Valid 10-digit Phone Number is mandatory.", txtPhone); return;
             }
-            ResetForm(); LoadGrid();
+
+            // Email Check
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text) && !Regex.IsMatch(txtEmail.Text, emailPattern))
+            {
+                ShowError("Please enter a valid email address.", txtEmail); return;
+            }
+
+            // Grade Check
+            if (cmbGrade.SelectedIndex == -1)
+            {
+                ShowError("Please select a Grade level.", cmbGrade); return;
+            }
+
+            // Rate Check
+            if (numRate.Value <= 0)
+            {
+                ShowError("Hourly Rate cannot be 0.", numRate); return;
+            }
+
+
+            // --- 2. DATA PREPARATION ---
+            var studentData = selectedStudent ?? new Student();
+            studentData.Name = txtName.Text;
+            studentData.SchoolName = txtSchool.Text;
+            studentData.Grade = cmbGrade.Text;
+            studentData.HourlyRate = numRate.Value;
+            studentData.Email = txtEmail.Text;
+            studentData.Phone = txtPhone.Text;
+            studentData.Description = txtDescription.Text;
+            studentData.IsActive = chkActive.Checked ? 1 : 0;
+
+            // --- 3. SAVE EXECUTION (With Progress Bar) ---
+            bool isSaved = await UIStyleHelper.ExecuteWithProgress("Updating Student Database...", async () =>
+            {
+                return await Task.Run(() =>
+                {
+                    try
+                    {
+                        if (selectedStudent == null)
+                            studentrepo.Add(studentData);
+                        else
+                            studentrepo.Update(studentData);
+
+                        return true;
+                    }
+                    catch { return false; }
+                });
+            });
+
+            if (isSaved)
+            {
+                ResetForm();
+                LoadGrid();
+            }
+        }
+
+        private void ShowError(string msg, Control ctrl)
+        {
+            MessageBox.Show(msg, "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            ctrl.Focus();
         }
 
         private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)

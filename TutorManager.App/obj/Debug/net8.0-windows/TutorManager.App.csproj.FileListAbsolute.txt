@@ -47,3 +47,7 @@ C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debu
 C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debug\net8.0-windows\TutorManager.App.pdb
 C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debug\net8.0-windows\TutorManager.App.genruntimeconfig.cache
 C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debug\net8.0-windows\ref\TutorManager.App.dll
+C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\bin\Debug\net8.0-windows\BCrypt.Net-Next.dll
+C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debug\net8.0-windows\TutorManager.App.UI.LoginForm.resources
+C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\obj\Debug\net8.0-windows\TutorManager.App.UI.RegisterForm.resources
+C:\Users\DELL\Documents\Venkat\MY_PROJECT\TutorManager\TutorManager.App\bin\Debug\net8.0-windows\TutorManager.App.dll.config

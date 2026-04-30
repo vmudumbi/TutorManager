@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Reflection.PortableExecutable;
+using System.Linq;
 using System.Windows.Forms;
 using TutorManager.App.Data;
 using TutorManager.App.Models;
@@ -19,9 +19,8 @@ namespace TutorManager.App.UI
         StudentRepository studentRepo = new StudentRepository();
         AttendanceRepository attRepo = new AttendanceRepository();
 
-        List<Student> students = new();
+        List<Student> students = new();    
 
-        // ================= UI =================
         private void InitializeComponent()
         {
             this.Text = "Attendance";
@@ -35,7 +34,6 @@ namespace TutorManager.App.UI
                 BackColor = Color.ForestGreen
             };
 
-            // TOP BAR
             Panel top = new Panel()
             {
                 Dock = DockStyle.Top,
@@ -56,8 +54,9 @@ namespace TutorManager.App.UI
             {
                 Left = 180,
                 Top = 20,
-                Width = 200   // bigger width (your request)
+                Width = 200
             };
+            dtDate.ValueChanged += (s, e) => LoadStudents();
 
             btnMarkAll = new Button()
             {
@@ -72,8 +71,6 @@ namespace TutorManager.App.UI
             };
             btnMarkAll.Click += BtnMarkAll_Click;
 
-            dtDate.ValueChanged += (s, e) => LoadStudents();
-
             btnSave = new Button()
             {
                 Text = "Save",
@@ -83,7 +80,8 @@ namespace TutorManager.App.UI
                 Height = 32,
                 BackColor = Color.Green,
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false // Disabled by default
             };
             btnSave.Click += BtnSave_Click;
 
@@ -92,7 +90,6 @@ namespace TutorManager.App.UI
             top.Controls.Add(btnMarkAll);
             top.Controls.Add(btnSave);
 
-            // GRID
             grid = new DataGridView()
             {
                 Dock = DockStyle.Fill,
@@ -101,14 +98,21 @@ namespace TutorManager.App.UI
                 RowHeadersVisible = false,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                EditMode = DataGridViewEditMode.EditOnEnter
             };
 
-            // HEADER STYLE
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             grid.EnableHeadersVisualStyles = false;
+
+            // Trigger for enabling Save button
+            grid.CellValueChanged += (s, e) => { btnSave.Enabled = true; };
+            grid.CurrentCellDirtyStateChanged += (s, e) =>
+            {
+                if (grid.IsCurrentCellDirty) grid.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            };
 
             this.Controls.Add(grid);
             this.Controls.Add(top);
@@ -118,152 +122,86 @@ namespace TutorManager.App.UI
             LoadGrades();
         }
 
-        // ================= GRID =================
         private void SetupGrid()
         {
             grid.Columns.Clear();
-
-            // ================= HEADER STYLE FIRST =================
-            grid.EnableHeadersVisualStyles = false;
-
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 150, 136);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-            // ================= COLUMNS =================
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "Id", Visible = false });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Student Name", ReadOnly = true });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Grade", HeaderText = "Grade", ReadOnly = true });
 
-            DataGridViewTextBoxColumn idCol = new DataGridViewTextBoxColumn();
-            idCol.Name = "Id";
-            idCol.HeaderText = "Id";
-            idCol.Visible = false;
-            grid.Columns.Add(idCol);
-
-            DataGridViewTextBoxColumn nameCol = new DataGridViewTextBoxColumn();
-            nameCol.Name = "Name";
-            nameCol.HeaderText = "Student Name";
-            nameCol.ReadOnly = true;
-            grid.Columns.Add(nameCol);
-
-            DataGridViewTextBoxColumn gradeCol = new DataGridViewTextBoxColumn();
-            gradeCol.Name = "Grade";
-            gradeCol.HeaderText = "Grade";
-            gradeCol.ReadOnly = true;
-            grid.Columns.Add(gradeCol);
-
-            // ================= TIME =================
             DataGridViewComboBoxColumn time = new DataGridViewComboBoxColumn();
             time.Name = "BatchTime";
             time.HeaderText = "Batch Time";
-            time.Items.AddRange("6 AM", "7 AM", "8 AM", "9 AM", "10 AM",
-                                "11 AM", "12 PM", "1 PM", "2 PM", "3 PM",
-                                "4 PM", "5 PM", "6 PM", "7 PM", "8 PM");
+            time.Items.AddRange("6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM", "8 PM");
             grid.Columns.Add(time);
 
-            // ================= HOURS =================
             DataGridViewComboBoxColumn hours = new DataGridViewComboBoxColumn();
             hours.Name = "Hours";
             hours.HeaderText = "Hours";
             hours.Items.AddRange("1", "1.5", "2", "2.5", "3");
             grid.Columns.Add(hours);
 
-            // ================= PRESENT =================
-            DataGridViewCheckBoxColumn present = new DataGridViewCheckBoxColumn();
-            present.Name = "Present";
-            present.HeaderText = "Present";
-            grid.Columns.Add(present);
+            grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Present", HeaderText = "Present" });
         }
 
-        // ================= LOAD =================
         private void LoadGrades()
         {
             cmbGrade.Items.Clear();
-
-            cmbGrade.Items.AddRange(new object[]
-            {
-                "Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"
-            });
-
+            cmbGrade.Items.AddRange(new object[] { "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12" });
             cmbGrade.SelectedIndex = 0;
         }
 
-
         private void LoadStudents()
         {
+            btnSave.Enabled = false; 
             string grade = cmbGrade.Text;
             DateTime selectedDate = dtDate.Value.Date;
 
-            students = studentRepo.GetAll()
-                .FindAll(x => x.Grade == grade && x.IsActive == 1);
-
+            students = studentRepo.GetAll().FindAll(x => x.Grade == grade && x.IsActive == 1);
             var attendanceList = attRepo.GetByDate(grade, selectedDate);
 
             grid.Rows.Clear();
 
             foreach (var s in students)
             {
-                var studentAtt = attendanceList
-                    .Where(x => x.StudentId == s.Id)
-                    .ToList();
+                var studentAtt = attendanceList.Where(x => x.StudentId == s.Id).ToList();
 
-                string safeTime = studentAtt.Any()
-    ? (studentAtt[0].BatchTime ?? "").Trim()
-    : "";
-
-                string safeHours = studentAtt.Any()
-                    ? studentAtt[0].HoursWorked.ToString()
-                    : "1";
-
+                string safeTime = studentAtt.Any() ? (studentAtt[0].BatchTime ?? "").Trim() : "";
+                string safeHours = studentAtt.Any() ? studentAtt[0].HoursWorked.ToString() : "1";
                 bool present = studentAtt.Any() && studentAtt[0].IsPresent;
 
-                // validate ComboBox values
-                var timeCol = (DataGridViewComboBoxColumn)grid.Columns[3];
-                if (!timeCol.Items.Contains(safeTime))
-                    safeTime = "";
+                // Validation
+                if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "7 AM";
+                if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1";
 
-                var hoursCol = (DataGridViewComboBoxColumn)grid.Columns[4];
-                if (!hoursCol.Items.Contains(safeHours))
-                    safeHours = "1";
-
-                grid.Rows.Add(
-                    s.Id,
-                    s.Name,
-                    s.Grade,
-                    safeTime,
-                    safeHours,
-                    present
-                );    
+                grid.Rows.Add(s.Id, s.Name, s.Grade, safeTime, safeHours, present);
             }
         }
 
-        // ================= MARK ALL =================
         private void BtnMarkAll_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in grid.Rows)
             {
-                row.Cells[4].Value = true;
+                row.Cells["Present"].Value = true;
             }
+            btnSave.Enabled = true;
         }
 
-        // ================= SAVE =================
         private void BtnSave_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in grid.Rows)
             {
                 if (row.IsNewRow) continue;
 
-                int studentId = Convert.ToInt32(row.Cells[0].Value);
-
-                string batchTime = row.Cells[3].Value?.ToString() ?? "";
-
-                decimal hoursWorked = 0;
-                decimal.TryParse(row.Cells[4].Value?.ToString(), out hoursWorked);
-
-                bool present = row.Cells[5].Value != null &&
-                               Convert.ToBoolean(row.Cells[5].Value);
-
-                if (present && hoursWorked == 0)
-                    hoursWorked = 1;
+                int studentId = Convert.ToInt32(row.Cells["Id"].Value);
+                string batchTime = row.Cells["BatchTime"].Value?.ToString() ?? "";
+                decimal.TryParse(row.Cells["Hours"].Value?.ToString(), out decimal hoursWorked);
+                bool present = row.Cells["Present"].Value != null && Convert.ToBoolean(row.Cells["Present"].Value);
 
                 attRepo.SaveAttendance(new Attendance
                 {
@@ -271,11 +209,12 @@ namespace TutorManager.App.UI
                     ClassDate = dtDate.Value.Date,
                     BatchTime = batchTime,
                     IsPresent = present,
-                    HoursWorked = hoursWorked
+                    HoursWorked = present ? (hoursWorked == 0 ? 1 : hoursWorked) : 0
                 });
             }
 
-            MessageBox.Show("Attendance Saved");
+            MessageBox.Show("Attendance Saved Successfully");
+            btnSave.Enabled = false;
         }
     }
 }

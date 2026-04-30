@@ -27,8 +27,8 @@ namespace TutorManager.App.UI
 
         private void InitializeComponent()
         {
-            string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\"));
-            string resourceFolder = Path.Combine(projectRoot, "Resources");
+
+            string resourceFolder = Path.Combine(AppContext.BaseDirectory, "Resources");       
 
             // ================= 1. SIDEBAR =================
             pnlSidebar = new Panel()
