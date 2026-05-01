@@ -11,7 +11,8 @@ namespace TutorManager.App.UI
 {
     public partial class ReportForm : Form
     {
-        ComboBox cmbGrade;
+        // Removed cmbGrade
+        ComboBox cmbLevel;
         DateTimePicker dtFrom, dtTo;
         Button btnLoad, btnExport;
 
@@ -24,8 +25,8 @@ namespace TutorManager.App.UI
 
         private void InitializeComponent()
         {
-            this.Text = "Reports";
-            this.Size = new Size(1100, 700);
+            this.Text = "Financial Reports";
+            this.Size = new Size(1150, 750);
             this.BackColor = Color.FromArgb(245, 247, 250);
 
             pnlHeader = new Panel()
@@ -43,22 +44,23 @@ namespace TutorManager.App.UI
                 BackColor = Color.White
             };
 
-            Label lblGrade = new Label() { Text = "Select Grade", Left = 20, Top = 12, AutoSize = true, Font = new Font("Segoe UI", 9) };
-            cmbGrade = new ComboBox()
+            // Maths Level Filter (Shifted to the left since Grade is gone)
+            Label lblLevel = new Label() { Text = "Filter by Maths Level", Left = 20, Top = 12, AutoSize = true, Font = new Font("Segoe UI", 9) };
+            cmbLevel = new ComboBox()
             {
                 Left = 20,
                 Top = 32,
-                Width = 140,
+                Width = 180,
                 Font = new Font("Segoe UI", 10),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            Label lblFrom = new Label() { Text = "From Date", Left = 180, Top = 12, AutoSize = true, Font = new Font("Segoe UI", 9) };
+            Label lblFrom = new Label() { Text = "From Date", Left = 220, Top = 12, AutoSize = true, Font = new Font("Segoe UI", 9) };
             dtFrom = new DateTimePicker()
             {
-                Left = 180,
+                Left = 220,
                 Top = 32,
-                Width = 200,
+                Width = 160,
                 Font = new Font("Segoe UI", 10),
                 Format = DateTimePickerFormat.Short
             };
@@ -68,7 +70,7 @@ namespace TutorManager.App.UI
             {
                 Left = 400,
                 Top = 32,
-                Width = 200,
+                Width = 160,
                 Font = new Font("Segoe UI", 10),
                 Format = DateTimePickerFormat.Short
             };
@@ -76,7 +78,7 @@ namespace TutorManager.App.UI
             btnLoad = new Button()
             {
                 Text = "Generate Report",
-                Left = 620,
+                Left = 580,
                 Top = 28,
                 Width = 150,
                 Height = 38,
@@ -90,7 +92,7 @@ namespace TutorManager.App.UI
             btnExport = new Button()
             {
                 Text = "Export CSV",
-                Left = 780,
+                Left = 740,
                 Top = 28,
                 Width = 130,
                 Height = 38,
@@ -98,14 +100,14 @@ namespace TutorManager.App.UI
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI Semibold", 10),
-                Enabled = false // Disabled by default until data is loaded
+                Enabled = false
             };
             btnExport.FlatAppearance.BorderSize = 0;
 
             btnLoad.Click += (s, e) => LoadReport();
             btnExport.Click += (s, e) => ExportToCsv();
 
-            top.Controls.AddRange(new Control[] { lblGrade, cmbGrade, lblFrom, dtFrom, lblTo, dtTo, btnLoad, btnExport });
+            top.Controls.AddRange(new Control[] { lblLevel, cmbLevel, lblFrom, dtFrom, lblTo, dtTo, btnLoad, btnExport });
 
             // ================= GRID =================
             grid = new DataGridView()
@@ -147,7 +149,7 @@ namespace TutorManager.App.UI
             this.Controls.Add(top);
             this.Controls.Add(pnlHeader);
 
-            LoadGrades();
+            LoadFilterData();
             SetupGrid();
         }
 
@@ -155,8 +157,9 @@ namespace TutorManager.App.UI
         {
             grid.Columns.Clear();
             grid.Columns.Add("Name", "Student Name");
+            grid.Columns.Add("Grade", "Grade"); // Added Grade back to the grid
             grid.Columns.Add("Level", "Maths Level");
-            grid.Columns.Add("Sessions", "Sessions Attended");
+            grid.Columns.Add("Sessions", "Sessions");
             grid.Columns.Add("Hours", "Total Hours");
             grid.Columns.Add("Rate", "Hourly Rate");
             grid.Columns.Add("Amount", "Total Earnings");
@@ -169,11 +172,17 @@ namespace TutorManager.App.UI
             grid.ColumnHeadersHeight = 45;
         }
 
-        void LoadGrades()
+        void LoadFilterData()
         {
-            cmbGrade.Items.Clear();
-            cmbGrade.Items.AddRange(new object[] { "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12" });
-            cmbGrade.SelectedIndex = 0;
+            cmbLevel.Items.Clear();
+            cmbLevel.Items.Add("All Levels");
+
+            var levels = studentRepo.GetLevels();
+            foreach (var lvl in levels)
+            {
+                cmbLevel.Items.Add(lvl);
+            }
+            cmbLevel.SelectedIndex = 0;
 
             dtFrom.Value = DateTime.Today.AddDays(-14);
             dtTo.Value = DateTime.Today;
@@ -182,13 +191,17 @@ namespace TutorManager.App.UI
         void LoadReport()
         {
             grid.Rows.Clear();
-            string grade = cmbGrade.Text;
+            string selectedLevel = cmbLevel.Text;
             DateTime from = dtFrom.Value.Date;
             DateTime to = dtTo.Value.Date;
 
-            var students = studentRepo.GetAll()
-                .Where(x => x.Grade == grade && x.IsActive == 1)
-                .ToList();
+            // Filter Students by Level only (or all)
+            var query = studentRepo.GetAll().Where(x => x.IsActive == 1);
+
+            if (selectedLevel != "All Levels")
+                query = query.Where(x => x.LevelName == selectedLevel);
+
+            var students = query.ToList();
 
             var attendance = attRepo.GetAll()
                 .Where(x => x.ClassDate >= from && x.ClassDate <= to && x.IsPresent)
@@ -199,6 +212,7 @@ namespace TutorManager.App.UI
             foreach (var s in students)
             {
                 var studentAtt = attendance.Where(x => x.StudentId == s.Id).ToList();
+                if (studentAtt.Count == 0) continue;
 
                 decimal hours = studentAtt.Sum(x => x.HoursWorked);
                 decimal rate = s.HourlyRate;
@@ -208,6 +222,7 @@ namespace TutorManager.App.UI
 
                 grid.Rows.Add(
                     s.Name,
+                    s.Grade, // Display Grade in Grid
                     s.LevelName,
                     studentAtt.Count,
                     hours.ToString("N2"),
@@ -217,8 +232,6 @@ namespace TutorManager.App.UI
             }
 
             lblFinalTotal.Text = $"Final Total: {grandTotal.ToString("C2")}";
-
-            // Enable Export button only if there is data
             btnExport.Enabled = grid.Rows.Count > 0;
         }
 
@@ -229,7 +242,7 @@ namespace TutorManager.App.UI
             SaveFileDialog sfd = new SaveFileDialog()
             {
                 Filter = "CSV file|*.csv",
-                FileName = $"Report_{cmbGrade.Text}_{DateTime.Now:yyyyMMdd}.csv"
+                FileName = $"Financial_Report_{cmbLevel.Text}_{DateTime.Now:yyyyMMdd}.csv"
             };
 
             if (sfd.ShowDialog() == DialogResult.OK)
@@ -238,24 +251,23 @@ namespace TutorManager.App.UI
                 {
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
-                        // Headers
-                        sw.WriteLine("Student,Sessions,Hours,Rate,Amount");
+                        // Headers - Added Grade
+                        sw.WriteLine("Student,Grade,Math Level,Sessions,Hours,Rate,Amount");
 
-                        // Data rows
                         foreach (DataGridViewRow row in grid.Rows)
                         {
                             if (row.IsNewRow) continue;
-                            sw.WriteLine($"{row.Cells[0].Value},{row.Cells[1].Value},{row.Cells[2].Value},\"{row.Cells[3].Value}\",\"{row.Cells[4].Value}\"");
+                            sw.WriteLine($"{row.Cells[0].Value},{row.Cells[1].Value},{row.Cells[2].Value},{row.Cells[3].Value},{row.Cells[4].Value},\"{row.Cells[5].Value}\",\"{row.Cells[6].Value}\"");
                         }
 
                         sw.WriteLine();
-                        sw.WriteLine($",,,,{lblFinalTotal.Text.Replace(",", "")}");
+                        sw.WriteLine($",,,,,, {lblFinalTotal.Text.Replace(",", "")}");
                     }
                     MessageBox.Show("Exported Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error exporting file: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

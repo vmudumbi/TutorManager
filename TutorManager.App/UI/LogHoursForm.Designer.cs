@@ -10,7 +10,8 @@ namespace TutorManager.App.UI
 {
     public partial class LogHoursForm : Form
     {
-        ComboBox cmbGrade;
+        // Changed from cmbGrade to cmbLevel
+        ComboBox cmbLevel;
         DateTimePicker dtDate;
         DataGridView grid;
         Button btnMarkAll, btnSave;
@@ -19,12 +20,11 @@ namespace TutorManager.App.UI
         StudentRepository studentRepo = new StudentRepository();
         AttendanceRepository attRepo = new AttendanceRepository();
 
-        List<Student> students = new();    
-
+        List<Student> students = new();
         private void InitializeComponent()
         {
-            this.Text = "Attendance";
-            this.Size = new Size(950, 600);
+            this.Text = "Log Attendance & Hours";
+            this.Size = new Size(1000, 650);
             this.BackColor = Color.FromArgb(245, 245, 245);
 
             pnlHeader = new Panel()
@@ -37,58 +37,62 @@ namespace TutorManager.App.UI
             Panel top = new Panel()
             {
                 Dock = DockStyle.Top,
-                Height = 70,
+                Height = 75,
                 BackColor = Color.White
             };
 
-            cmbGrade = new ComboBox()
+            // Level Filter Label
+            Label lblFilter = new Label() { Text = "Maths Level:", Left = 20, Top = 5, AutoSize = true, Font = new Font("Segoe UI", 8) };
+
+            cmbLevel = new ComboBox()
             {
                 Left = 20,
-                Top = 20,
-                Width = 140,
+                Top = 23,
+                Width = 160,
+                Font = new Font("Segoe UI", 10),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            cmbGrade.SelectedIndexChanged += (s, e) => LoadStudents();
+            cmbLevel.SelectedIndexChanged += (s, e) => LoadStudents();
 
             dtDate = new DateTimePicker()
             {
-                Left = 180,
-                Top = 20,
-                Width = 200
+                Left = 200,
+                Top = 23,
+                Width = 180,
+                Font = new Font("Segoe UI", 10)
             };
             dtDate.ValueChanged += (s, e) => LoadStudents();
 
             btnMarkAll = new Button()
             {
-                Text = "Mark All",
+                Text = "Mark All Present",
                 Left = 400,
-                Top = 18,
-                Width = 120,
-                Height = 32,
+                Top = 20,
+                Width = 130,
+                Height = 35,
                 BackColor = Color.FromArgb(0, 120, 215),
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI Semibold", 9)
             };
             btnMarkAll.Click += BtnMarkAll_Click;
 
             btnSave = new Button()
             {
-                Text = "Save",
+                Text = "Save Attendance",
                 Left = 540,
-                Top = 18,
-                Width = 120,
-                Height = 32,
+                Top = 20,
+                Width = 130,
+                Height = 35,
                 BackColor = Color.Green,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Enabled = false // Disabled by default
+                Font = new Font("Segoe UI Semibold", 9),
+                Enabled = false
             };
             btnSave.Click += BtnSave_Click;
 
-            top.Controls.Add(cmbGrade);
-            top.Controls.Add(dtDate);
-            top.Controls.Add(btnMarkAll);
-            top.Controls.Add(btnSave);
+            top.Controls.AddRange(new Control[] { lblFilter, cmbLevel, dtDate, btnMarkAll, btnSave });
 
             grid = new DataGridView()
             {
@@ -99,15 +103,11 @@ namespace TutorManager.App.UI
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                EditMode = DataGridViewEditMode.EditOnEnter
+                EditMode = DataGridViewEditMode.EditOnEnter,
+                RowTemplate = { Height = 35 }
             };
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48);
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            grid.EnableHeadersVisualStyles = false;
-
-            // Trigger for enabling Save button
+            // Selection Logic for Save Button
             grid.CellValueChanged += (s, e) => { btnSave.Enabled = true; };
             grid.CurrentCellDirtyStateChanged += (s, e) =>
             {
@@ -119,22 +119,23 @@ namespace TutorManager.App.UI
             this.Controls.Add(pnlHeader);
 
             SetupGrid();
-            LoadGrades();
+            LoadLevels(); // Changed from LoadGrades
         }
 
         private void SetupGrid()
         {
             grid.Columns.Clear();
             grid.AutoGenerateColumns = false;
+            grid.EnableHeadersVisualStyles = false;
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 150, 136);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI Semibold", 10);
+            grid.ColumnHeadersHeight = 40;
 
-            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "Id", Visible = false });
-            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Student Name", ReadOnly = true });
-            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Grade", HeaderText = "Grade", ReadOnly = true });
-            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "MathsLevel", HeaderText = "Maths Level", DataPropertyName = "LevelName", ReadOnly = true });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", Visible = false });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Student Name", ReadOnly = true, FillWeight = 150 });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Grade", HeaderText = "Grade", ReadOnly = true, FillWeight = 80 });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "MathsLevel", HeaderText = "Level", ReadOnly = true, FillWeight = 100 });
 
             DataGridViewComboBoxColumn time = new DataGridViewComboBoxColumn();
             time.Name = "BatchTime";
@@ -148,39 +149,49 @@ namespace TutorManager.App.UI
             hours.Items.AddRange("1", "1.5", "2", "2.5", "3");
             grid.Columns.Add(hours);
 
-            grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Present", HeaderText = "Present" });
+            grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Present", HeaderText = "Present", FillWeight = 60 });
         }
 
-
-        private void LoadGrades()
+        private void LoadLevels()
         {
-            cmbGrade.Items.Clear();
-            cmbGrade.Items.AddRange(new object[] { "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12" });
-            cmbGrade.SelectedIndex = 0;
+            cmbLevel.Items.Clear();
+            var levels = studentRepo.GetLevels(); // Assuming this returns List<string> or List<MathsLevel>
+            foreach (var lvl in levels)
+            {
+                cmbLevel.Items.Add(lvl);
+            }
+
+            if (cmbLevel.Items.Count > 0) cmbLevel.SelectedIndex = 0;
         }
 
         private void LoadStudents()
         {
-            btnSave.Enabled = false; 
-            string grade = cmbGrade.Text;
+            if (cmbLevel.SelectedItem == null) return;
+
+            btnSave.Enabled = false;
+            string selectedLevel = cmbLevel.Text;
             DateTime selectedDate = dtDate.Value.Date;
 
-            students = studentRepo.GetAll().FindAll(x => x.Grade == grade && x.IsActive == 1);
-            var attendanceList = attRepo.GetByDate(grade, selectedDate);
+            // 1. Filter students by LevelName instead of Grade
+            students = studentRepo.GetAll().FindAll(x => x.LevelName == selectedLevel && x.IsActive == 1);
+
+            // 2. Get existing attendance for this level and date
+            // Note: If your GetByDate uses grade, you might need to update that Repo method to filter by Level or Student IDs
+            var attendanceList = attRepo.GetAll().Where(x => x.ClassDate == selectedDate).ToList();
 
             grid.Rows.Clear();
 
             foreach (var s in students)
             {
-                var studentAtt = attendanceList.Where(x => x.StudentId == s.Id).ToList();
+                var studentAtt = attendanceList.FirstOrDefault(x => x.StudentId == s.Id);
 
-                string safeTime = studentAtt.Any() ? (studentAtt[0].BatchTime ?? "").Trim() : "";
-                string safeHours = studentAtt.Any() ? studentAtt[0].HoursWorked.ToString() : "1";
-                bool present = studentAtt.Any() && studentAtt[0].IsPresent;
+                string safeTime = studentAtt != null ? (studentAtt.BatchTime ?? "").Trim() : "4 PM"; // Default to a common time
+                string safeHours = studentAtt != null ? studentAtt.HoursWorked.ToString() : "1.5";
+                bool present = studentAtt != null && studentAtt.IsPresent;
 
-                // Validation
-                if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "7 AM";
-                if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1";
+                // Validating dropdown selections
+                if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "4 PM";
+                if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1.5";
 
                 grid.Rows.Add(s.Id, s.Name, s.Grade, s.LevelName, safeTime, safeHours, present);
             }
@@ -216,7 +227,7 @@ namespace TutorManager.App.UI
                 });
             }
 
-            MessageBox.Show("Attendance Saved Successfully");
+            MessageBox.Show("Attendance Saved Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             btnSave.Enabled = false;
         }
     }
