@@ -7,6 +7,7 @@ using TutorManager.App.Data;
 using TutorManager.App.UI;
 using TutorManager.App.Utilities;
 
+
 namespace TutorManager.App.UI
 {
     public partial class MainForm : Form
@@ -17,7 +18,9 @@ namespace TutorManager.App.UI
         Label lblTitleLogo, lblManager, lblTitle;
         PictureBox picLogo, picBackground;
         Panel pnlOverlay;
-        System.Windows.Forms.Timer activityTimer;
+        private GlobalInputTracker inputTracker;
+        private System.Windows.Forms.Timer activityTimer;
+        
 
         // Styling
         Color sidebarColor = Color.FromArgb(24, 28, 36);
@@ -25,6 +28,7 @@ namespace TutorManager.App.UI
         Color accentTeal = Color.FromArgb(0, 180, 160);
         private Button currentBtn = null;
         private bool isLoggingOut = false;
+                
 
         private void InitializeComponent(bool isAdmin)
         {
@@ -194,6 +198,46 @@ namespace TutorManager.App.UI
 
             this.Load += MainForm_Load;
             this.Resize += (s, e) => CenterWelcomePanel();
+
+            //Timer
+            inputTracker = new GlobalInputTracker();
+            inputTracker.UserActivity += ResetActivityTimer;
+
+            Application.AddMessageFilter(inputTracker);
+
+            // Timer
+            activityTimer = new System.Windows.Forms.Timer();
+            activityTimer.Interval = 5 * 60 * 1000; ; // 5 min
+            activityTimer.Tick += ActivityTimer_Tick;
+            activityTimer.Start();
+        }
+
+        private void ResetActivityTimer()
+        {
+            activityTimer.Stop();
+            activityTimer.Start();
+        }
+
+        private void ActivityTimer_Tick(object sender, EventArgs e)
+        {
+            activityTimer.Stop();
+
+            // Show dashboard again
+            picBackground.Visible = true;
+            pnlHeader.Visible = false;
+
+            // Remove opened forms
+            for (int i = pnlMain.Controls.Count - 1; i >= 0; i--)
+            {
+                if (pnlMain.Controls[i] is Form)
+                    pnlMain.Controls.RemoveAt(i);
+            }
+
+            // Reset sidebar highlight
+            if (currentBtn != null)
+                currentBtn.BackColor = sidebarColor;
+
+            currentBtn = null;
         }
 
         private void CenterWelcomePanel()
