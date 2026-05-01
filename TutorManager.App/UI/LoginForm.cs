@@ -33,10 +33,13 @@ namespace TutorManager.App.UI
 
             if (loginSuccessful)
             {
-                // Use the DialogResult approach we discussed to 
-                // cleanly transition from Login to Main
-                this.DialogResult = DialogResult.OK;
+                var isAdmin = user == "admin" ? true : false;
+
+                MainForm main = new MainForm(isAdmin);
+                this.Hide();
+                main.ShowDialog();
                 this.Close();
+
             }
             else
             {

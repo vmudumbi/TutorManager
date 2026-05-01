@@ -12,6 +12,8 @@ namespace TutorManager.App.Models
         public string Name { get; set; } = "";
         public string SchoolName { get; set; } = "";
         public string Grade { get; set; } = "";
+        public int LevelId { get; set; }
+        public string LevelName { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public decimal HourlyRate { get; set; }

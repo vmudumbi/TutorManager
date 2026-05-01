@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TutorManager.App.Data;
 using TutorManager.App.UI;
 using TutorManager.App.Utilities;
 
@@ -12,7 +13,7 @@ namespace TutorManager.App.UI
     {
         // Controls
         Panel pnlSidebar, pnlMain, pnlLogo, pnlHeader;
-        Button btnStudents, btnAttendance, btnReports;
+        Button btnStudents, btnAttendance, btnReports,btnBackUp, btnLogout;
         Label lblTitleLogo, lblManager, lblTitle;
         PictureBox picLogo, picBackground;
         Panel pnlOverlay;
@@ -23,11 +24,11 @@ namespace TutorManager.App.UI
         Color hoverColor = Color.FromArgb(45, 50, 65);
         Color accentTeal = Color.FromArgb(0, 180, 160);
         private Button currentBtn = null;
-             
+        private bool isLoggingOut = false;
 
-        private void InitializeComponent()
+        private void InitializeComponent(bool isAdmin)
         {
-
+           
             string resourceFolder = Path.Combine(AppContext.BaseDirectory, "Resources");       
 
             // ================= 1. SIDEBAR =================
@@ -60,16 +61,62 @@ namespace TutorManager.App.UI
             // Sidebar Buttons
             btnStudents = CreateBtn("Students", 120);
             btnAttendance = CreateBtn("Attendance", 175);
-            btnReports = CreateBtn("Reports", 230);
+            btnReports = CreateBtn("Reports", 230);           
 
             btnStudents.Click += (s, e) => { ActivateButton(btnStudents); lblTitle.Text = "Student Management"; OpenForm(new StudentForm()); };
             btnAttendance.Click += (s, e) => { ActivateButton(btnAttendance); lblTitle.Text = "Attendance Tracking"; OpenForm(new LogHoursForm()); };
             btnReports.Click += (s, e) => { ActivateButton(btnReports); lblTitle.Text = "Performance Reports"; OpenForm(new ReportForm()); };
 
+            btnLogout = new Button()
+            {
+                Text = "   Logout",
+                Dock = DockStyle.Bottom,
+                Height = 48,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = sidebarColor,
+                ForeColor = Color.FromArgb(255, 120, 120),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleLeft,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(15, 0, 0, 0),
+                TextImageRelation = TextImageRelation.ImageBeforeText
+            };
+
+            btnLogout.FlatAppearance.BorderSize = 0;
+            btnLogout.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 45, 60);
+            btnLogout.FlatAppearance.MouseDownBackColor = Color.FromArgb(30, 35, 50);
+
+            btnLogout.Click += async (s, e) =>
+            {
+                var result = MessageBox.Show(
+                    "Are you sure you want to log out?",
+                    "Logout",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    isLoggingOut = true;
+                    btnLogout.Enabled = false;
+                    await PerformAutoBackupAsync();
+                    LoginForm login = new LoginForm();
+                    this.Hide();
+                    login.ShowDialog();
+                    this.Close();
+                }
+            };
+
+            var img = Image.FromFile(Path.Combine(resourceFolder, "logout.png"));
+            btnLogout.Image = new Bitmap(img, new Size(18, 18));
+
+            btnLogout.Cursor = Cursors.Hand;
+
             pnlSidebar.Controls.Add(btnReports);
             pnlSidebar.Controls.Add(btnAttendance);
             pnlSidebar.Controls.Add(btnStudents);
             pnlSidebar.Controls.Add(pnlLogo);
+            pnlSidebar.Controls.Add(btnLogout);
+            btnLogout.BringToFront();
 
             // ================= 2. MAIN CONTAINER =================
             pnlMain = new Panel()
@@ -133,6 +180,18 @@ namespace TutorManager.App.UI
             this.Controls.Add(pnlMain);
             this.Controls.Add(pnlSidebar);
 
+            if (isAdmin)
+            {               
+                btnBackUp = CreateBtn("Backup", 285);               
+                btnBackUp.Click += (s, e) => {
+                    ActivateButton(btnBackUp);
+                    lblTitle.Text = "Backup Management";
+                    OpenForm(new BackupForm());
+                };          
+                pnlSidebar.Controls.Add(btnBackUp);
+                btnBackUp.BringToFront();
+            }
+
             this.Load += MainForm_Load;
             this.Resize += (s, e) => CenterWelcomePanel();
         }
@@ -153,6 +212,27 @@ namespace TutorManager.App.UI
 
             picBackground.Visible = false; // Hide welcome
             pnlHeader.Visible = true;     // Show clean header
+        }
+
+        private async Task PerformAutoBackupAsync()
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    var repo = new BackupRepository();
+                    string dbPath = Path.Combine(AppContext.BaseDirectory, "tutor.db");
+                    if (File.Exists(dbPath))
+                    {
+                        repo.PerformAutoBackup(dbPath);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Don’t crash UI — log silently
+                System.Diagnostics.Debug.WriteLine("Auto-backup failed: " + ex.Message);
+            }
         }
 
         void OpenForm(Form form)
@@ -178,6 +258,22 @@ namespace TutorManager.App.UI
             return btn;
         }
 
-        private async void MainForm_Load(object sender, EventArgs e) { CenterWelcomePanel(); await Task.Delay(100); }
+        private async void MainForm_Load(object sender, EventArgs e)
+        {
+            // Center your welcome screen
+            CenterWelcomePanel();            
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!isLoggingOut && e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                MessageBox.Show("Please use Logout button.", "Action not allowed");
+                return;
+            }
+
+            base.OnFormClosing(e);
+        }
     }
 }

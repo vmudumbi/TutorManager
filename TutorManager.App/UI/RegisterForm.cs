@@ -40,7 +40,7 @@ namespace TutorManager.App.UI
             }
 
             // 3. Attempt to Save to Database
-            if (_userRepo.Add(user, pass))
+            if (_userRepo.Add(user, pass,"staff"))
             {
                 this.DialogResult = DialogResult.OK;
                 this.Close();

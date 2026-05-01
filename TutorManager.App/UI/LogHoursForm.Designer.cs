@@ -125,6 +125,7 @@ namespace TutorManager.App.UI
         private void SetupGrid()
         {
             grid.Columns.Clear();
+            grid.AutoGenerateColumns = false;
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 150, 136);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -133,6 +134,7 @@ namespace TutorManager.App.UI
             grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "Id", Visible = false });
             grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Student Name", ReadOnly = true });
             grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Grade", HeaderText = "Grade", ReadOnly = true });
+            grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "MathsLevel", HeaderText = "Maths Level", DataPropertyName = "LevelName", ReadOnly = true });
 
             DataGridViewComboBoxColumn time = new DataGridViewComboBoxColumn();
             time.Name = "BatchTime";
@@ -148,6 +150,7 @@ namespace TutorManager.App.UI
 
             grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Present", HeaderText = "Present" });
         }
+
 
         private void LoadGrades()
         {
@@ -179,7 +182,7 @@ namespace TutorManager.App.UI
                 if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "7 AM";
                 if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1";
 
-                grid.Rows.Add(s.Id, s.Name, s.Grade, safeTime, safeHours, present);
+                grid.Rows.Add(s.Id, s.Name, s.Grade, s.LevelName, safeTime, safeHours, present);
             }
         }
 

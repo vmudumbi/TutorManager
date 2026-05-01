@@ -8,9 +8,6 @@ namespace TutorManager.App.Utility
 {
     public static class UIStyleHelper
     {
-        // Define paths
-        //private static string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\"));
-        //private static string resourceFolder = Path.Combine(projectRoot, "Resources");
 
         public static async Task<bool> ExecuteWithProgress(string message, Func<Task<bool>> work)
         {

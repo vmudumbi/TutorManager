@@ -8,7 +8,7 @@ namespace TutorManager.App.Data
     public class UserRepository
     {
         // Add a new user with a Salted Hash
-        public bool Add(string username, string password)
+        public bool Add(string username, string password,string role)
         {
             try
             {
@@ -20,11 +20,12 @@ namespace TutorManager.App.Data
 
                 var cmd = con.CreateCommand();
                 cmd.CommandText = @"
-                    INSERT INTO Users (Username, Password) 
-                    VALUES ($user, $pass)";
+                    INSERT INTO Users (Username, Password, Role) 
+                    VALUES ($user, $pass, $role)";
 
                 cmd.Parameters.AddWithValue("$user", username);
                 cmd.Parameters.AddWithValue("$pass", hashedPassword);
+                cmd.Parameters.AddWithValue("$role", role);
 
                 return cmd.ExecuteNonQuery() > 0;
             }

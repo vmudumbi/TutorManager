@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using TutorManager.App.Models;
 
@@ -15,13 +16,14 @@ namespace TutorManager.App.Data
             cmd.CommandText =
             @"
             INSERT INTO Students 
-            (Name, SchoolName, Grade, Email, Phone, HourlyRate, Description, IsActive)
-            VALUES ($name, $school, $grade, $email, $phone, $rate, $desc, $active)
+            (Name, SchoolName, Grade, MathsLevelId, Email, Phone, HourlyRate, Description, IsActive)
+            VALUES ($name, $school, $grade, $levelId, $email, $phone, $rate, $desc, $active)
             ";
 
             cmd.Parameters.AddWithValue("$name", s.Name);
             cmd.Parameters.AddWithValue("$school", s.SchoolName ?? "");
             cmd.Parameters.AddWithValue("$grade", s.Grade ?? "");
+            cmd.Parameters.AddWithValue("$levelId", s.LevelId); 
             cmd.Parameters.AddWithValue("$email", s.Email ?? "");
             cmd.Parameters.AddWithValue("$phone", s.Phone ?? "");
             cmd.Parameters.AddWithValue("$rate", s.HourlyRate);
@@ -40,8 +42,10 @@ namespace TutorManager.App.Data
             cmd.CommandText =
             @"
             UPDATE Students
-            SET SchoolName=$school,
+            SET Name=$name,
+                SchoolName=$school,
                 Grade=$grade,
+                MathsLevelId=$mathsId, 
                 Email=$email,
                 Phone=$phone,
                 HourlyRate=$rate,
@@ -51,8 +55,10 @@ namespace TutorManager.App.Data
             ";
 
             cmd.Parameters.AddWithValue("$id", s.Id);
+            cmd.Parameters.AddWithValue("$name", s.Name);
             cmd.Parameters.AddWithValue("$school", s.SchoolName ?? "");
             cmd.Parameters.AddWithValue("$grade", s.Grade ?? "");
+            cmd.Parameters.AddWithValue("$mathsId", s.LevelId); 
             cmd.Parameters.AddWithValue("$email", s.Email ?? "");
             cmd.Parameters.AddWithValue("$phone", s.Phone ?? "");
             cmd.Parameters.AddWithValue("$rate", s.HourlyRate);
@@ -70,28 +76,52 @@ namespace TutorManager.App.Data
             con.Open();
 
             var cmd = con.CreateCommand();
-            cmd.CommandText = onlyActive
-                ? "SELECT * FROM Students WHERE IsActive = 1"
-                : "SELECT * FROM Students";
 
+            // JOIN added to get the LevelName for the UI
+            string sql = @"
+                SELECT s.*, m.LevelName 
+                FROM Students s
+                INNER JOIN MathsLevels m ON s.MathsLevelId = m.Id";
+
+            if (onlyActive)
+                sql += " WHERE s.IsActive = 1";
+
+            cmd.CommandText = sql;
             var reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
                 list.Add(new Student
                 {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    SchoolName = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                    Grade = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                    Email = reader.IsDBNull(4) ? "" : reader.GetString(4),
-                    Phone = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                    HourlyRate = reader.IsDBNull(6) ? 0 : Convert.ToDecimal(reader[6]),
-                    Description = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                    IsActive = reader.GetInt32(8)
+                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                    SchoolName = reader.IsDBNull(reader.GetOrdinal("SchoolName")) ? "" : reader.GetString(reader.GetOrdinal("SchoolName")),
+                    Grade = reader.IsDBNull(reader.GetOrdinal("Grade")) ? "" : reader.GetString(reader.GetOrdinal("Grade")),
+                    LevelName = reader.GetString(reader.GetOrdinal("LevelName")),
+                    LevelId = reader.GetInt32(reader.GetOrdinal("MathsLevelId")),
+                    Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? "" : reader.GetString(reader.GetOrdinal("Email")),
+                    Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
+                    HourlyRate = reader.GetDecimal(reader.GetOrdinal("HourlyRate")),
+                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? "" : reader.GetString(reader.GetOrdinal("Description")),
+                    IsActive = reader.GetInt32(reader.GetOrdinal("IsActive"))
                 });
             }
 
+            return list;
+        }
+
+        public List<MathsLevel> GetLevels()
+        {
+            var list = new List<MathsLevel>();
+            using var con = Db.GetConnection();
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT Id, LevelName FROM MathsLevels";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(new MathsLevel { Id = reader.GetInt32(0), LevelName = reader.GetString(1) });
+            }
             return list;
         }
 
@@ -101,15 +131,11 @@ namespace TutorManager.App.Data
             con.Open();
 
             var cmd = con.CreateCommand();
-            cmd.CommandText =
-            @"
-    UPDATE Students
-    SET IsActive = 0
-    WHERE Id = $id
-    ";
-
+            cmd.CommandText = "UPDATE Students SET IsActive = 0 WHERE Id = $id";
             cmd.Parameters.AddWithValue("$id", id);
             cmd.ExecuteNonQuery();
         }
+
+
     }
-}   
+}

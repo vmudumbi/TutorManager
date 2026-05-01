@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TutorManager.App.Data;
 
 namespace TutorManager.App.UI
 {
     public partial class MainForm : Form
     {
-        public MainForm()
+        public MainForm(bool isAdmin = false)
         {
-            InitializeComponent();
+            InitializeComponent(isAdmin);
         }
     }
 }

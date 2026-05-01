@@ -155,6 +155,7 @@ namespace TutorManager.App.UI
         {
             grid.Columns.Clear();
             grid.Columns.Add("Name", "Student Name");
+            grid.Columns.Add("Level", "Maths Level");
             grid.Columns.Add("Sessions", "Sessions Attended");
             grid.Columns.Add("Hours", "Total Hours");
             grid.Columns.Add("Rate", "Hourly Rate");
@@ -207,6 +208,7 @@ namespace TutorManager.App.UI
 
                 grid.Rows.Add(
                     s.Name,
+                    s.LevelName,
                     studentAtt.Count,
                     hours.ToString("N2"),
                     rate.ToString("C2"),

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TutorManager.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+253e5167879068f3cf6ab3cc726292a8394d49a4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f03ce34b6802b707946839d022fdefa7a86fd34")]
 [assembly: System.Reflection.AssemblyProductAttribute("TutorManager.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TutorManager.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -16,7 +16,7 @@ namespace TutorManager.App.UI
         public StudentForm()
         {            
             InitializeComponent();
-            this.BackColor = bodyBg; 
+            //this.BackColor = bodyBg; 
             LoadGrid();
         }
     }
