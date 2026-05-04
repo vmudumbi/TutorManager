@@ -156,13 +156,14 @@ namespace TutorManager.App.UI
         void SetupGrid()
         {
             grid.Columns.Clear();
-            grid.Columns.Add("Name", "Student Name");
-            grid.Columns.Add("Grade", "Grade"); // Added Grade back to the grid
-            grid.Columns.Add("Level", "Maths Level");
-            grid.Columns.Add("Sessions", "Sessions");
-            grid.Columns.Add("Hours", "Total Hours");
-            grid.Columns.Add("Rate", "Hourly Rate");
-            grid.Columns.Add("Amount", "Total Earnings");
+            grid.Columns.Add("Date", "Date");            // Index 0
+            grid.Columns.Add("Time", "Batch Time");      // Index 1
+            grid.Columns.Add("Name", "Student Name");    // Index 2
+            grid.Columns.Add("Grade", "Grade");          // Index 3
+            grid.Columns.Add("Level", "Maths Level");    // Index 4
+            grid.Columns.Add("Hours", "Hours");          // Index 5
+            grid.Columns.Add("Rate", "Hourly Rate");     // Index 6
+            grid.Columns.Add("Amount", "Total Earnings");// Index 7
 
             grid.EnableHeadersVisualStyles = false;
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 150, 136);
@@ -195,40 +196,39 @@ namespace TutorManager.App.UI
             DateTime from = dtFrom.Value.Date;
             DateTime to = dtTo.Value.Date;
 
-            // Filter Students by Level only (or all)
-            var query = studentRepo.GetAll().Where(x => x.IsActive == 1);
+            // 1. Get all active students first for reference
+            var allStudents = studentRepo.GetAll().Where(x => x.IsActive == 1).ToList();
 
-            if (selectedLevel != "All Levels")
-                query = query.Where(x => x.LevelName == selectedLevel);
-
-            var students = query.ToList();
-
+            // 2. Get all present attendance within the date range
             var attendance = attRepo.GetAll()
                 .Where(x => x.ClassDate >= from && x.ClassDate <= to && x.IsPresent)
+                .OrderByDescending(x => x.ClassDate) // Show newest first
                 .ToList();
 
             decimal grandTotal = 0;
 
-            foreach (var s in students)
+            foreach (var att in attendance)
             {
-                var studentAtt = attendance.Where(x => x.StudentId == s.Id).ToList();
-                if (studentAtt.Count == 0) continue;
+                // Find the student linked to this specific attendance record
+                var s = allStudents.FirstOrDefault(x => x.Id == att.StudentId);
 
-                decimal hours = studentAtt.Sum(x => x.HoursWorked);
-                decimal rate = s.HourlyRate;
-                decimal amount = hours * rate;
+                // Skip if student doesn't match the Level filter
+                if (s == null) continue;
+                if (selectedLevel != "All Levels" && s.LevelName != selectedLevel) continue;
 
+                decimal amount = att.HoursWorked * s.HourlyRate;
                 grandTotal += amount;
 
                 grid.Rows.Add(
-                    s.Name,
-                    s.Grade, // Display Grade in Grid
-                    s.LevelName,
-                    studentAtt.Count,
-                    hours.ToString("N2"),
-                    rate.ToString("C2"),
-                    amount.ToString("C2")
-                );
+                att.ClassDate.ToShortDateString(), // 0: Date
+                att.BatchTime ?? "N/A",            // 1: Time (This was likely missing!)
+                s.Name,                            // 2: Name
+                s.Grade,                           // 3: Grade
+                s.LevelName,                       // 4: Level
+                att.HoursWorked.ToString("N2"),    // 5: Hours
+                s.HourlyRate.ToString("C2"),       // 6: Rate
+                amount.ToString("C2")              // 7: Amount (Total Earnings)
+        );
             }
 
             lblFinalTotal.Text = $"Final Total: {grandTotal.ToString("C2")}";
@@ -252,12 +252,12 @@ namespace TutorManager.App.UI
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
                         // Headers - Added Grade
-                        sw.WriteLine("Student,Grade,Math Level,Sessions,Hours,Rate,Amount");
+                        sw.WriteLine("Date,Student,Grade,Math Level,Hours,Rate,Amount");
 
                         foreach (DataGridViewRow row in grid.Rows)
                         {
                             if (row.IsNewRow) continue;
-                            sw.WriteLine($"{row.Cells[0].Value},{row.Cells[1].Value},{row.Cells[2].Value},{row.Cells[3].Value},{row.Cells[4].Value},\"{row.Cells[5].Value}\",\"{row.Cells[6].Value}\"");
+                            sw.WriteLine($"{row.Cells[0].Value},{row.Cells[1].Value},{row.Cells[2].Value},{row.Cells[3].Value},{row.Cells[4].Value},\"{row.Cells[5].Value}\",\"{row.Cells[6].Value}\",\"{row.Cells[7].Value}\"");
                         }
 
                         sw.WriteLine();

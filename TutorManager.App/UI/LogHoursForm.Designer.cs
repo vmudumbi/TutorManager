@@ -24,7 +24,7 @@ namespace TutorManager.App.UI
         private void InitializeComponent()
         {
             this.Text = "Log Attendance & Hours";
-            this.Size = new Size(1000, 650);
+            this.Size = new Size(1050, 650);
             this.BackColor = Color.FromArgb(245, 245, 245);
 
             pnlHeader = new Panel()
@@ -58,15 +58,16 @@ namespace TutorManager.App.UI
             {
                 Left = 200,
                 Top = 23,
-                Width = 180,
-                Font = new Font("Segoe UI", 10)
+                Width = 250,
+                Font = new Font("Segoe UI", 10),
+                Format = DateTimePickerFormat.Long
             };
             dtDate.ValueChanged += (s, e) => LoadStudents();
 
             btnMarkAll = new Button()
             {
                 Text = "Mark All Present",
-                Left = 400,
+                Left = 470,
                 Top = 20,
                 Width = 130,
                 Height = 35,
@@ -80,7 +81,7 @@ namespace TutorManager.App.UI
             btnSave = new Button()
             {
                 Text = "Save Attendance",
-                Left = 540,
+                Left = 610,
                 Top = 20,
                 Width = 130,
                 Height = 35,
@@ -185,13 +186,13 @@ namespace TutorManager.App.UI
             {
                 var studentAtt = attendanceList.FirstOrDefault(x => x.StudentId == s.Id);
 
-                string safeTime = studentAtt != null ? (studentAtt.BatchTime ?? "").Trim() : "4 PM"; // Default to a common time
-                string safeHours = studentAtt != null ? studentAtt.HoursWorked.ToString() : "1.5";
+                string safeTime = studentAtt != null ? (studentAtt.BatchTime ?? "").Trim() : "7 AM"; 
+                string safeHours = studentAtt != null ? studentAtt.HoursWorked.ToString() : "1";
                 bool present = studentAtt != null && studentAtt.IsPresent;
 
                 // Validating dropdown selections
-                if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "4 PM";
-                if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1.5";
+                if (!((DataGridViewComboBoxColumn)grid.Columns["BatchTime"]).Items.Contains(safeTime)) safeTime = "6 PM";
+                if (!((DataGridViewComboBoxColumn)grid.Columns["Hours"]).Items.Contains(safeHours)) safeHours = "1";
 
                 grid.Rows.Add(s.Id, s.Name, s.Grade, s.LevelName, safeTime, safeHours, present);
             }

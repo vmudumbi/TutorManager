@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\reportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\reportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\data\\db.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\data\\db.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,14 +39,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "MainForm.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\MainForm.Designer.cs",
-              "RelativeDocumentMoniker": "TutorManager.App\\UI\\MainForm.Designer.cs",
-              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\MainForm.Designer.cs",
-              "RelativeToolTip": "TutorManager.App\\UI\\MainForm.Designer.cs",
-              "ViewState": "AgIAAMQAAAAAAAAAAAAIwNAAAAA9AAAAAAAAAA==",
+              "Title": "LogHoursForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\LogHoursForm.Designer.cs",
+              "RelativeDocumentMoniker": "TutorManager.App\\UI\\LogHoursForm.Designer.cs",
+              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\LogHoursForm.Designer.cs*",
+              "RelativeToolTip": "TutorManager.App\\UI\\LogHoursForm.Designer.cs*",
+              "ViewState": "AgIAABkAAAAAAAAAAAAgwDwAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-01T18:57:41.196Z",
+              "WhenOpened": "2026-05-04T14:10:02.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ReportForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\ReportForm.Designer.cs",
+              "RelativeDocumentMoniker": "TutorManager.App\\UI\\ReportForm.Designer.cs",
+              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\ReportForm.Designer.cs",
+              "RelativeToolTip": "TutorManager.App\\UI\\ReportForm.Designer.cs",
+              "ViewState": "AgIAAMYAAAAAAAAAAAAWwOQAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-04T13:52:21.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Db.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\Data\\Db.cs",
+              "RelativeDocumentMoniker": "TutorManager.App\\Data\\Db.cs",
+              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\Data\\Db.cs",
+              "RelativeToolTip": "TutorManager.App\\Data\\Db.cs",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAswE8AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-04T13:50:10.747Z",
               "EditorCaption": ""
             }
           ]
