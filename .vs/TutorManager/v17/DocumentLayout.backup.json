@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\reportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\reportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|solutionrelative:tutormanager.app\\ui\\loghoursform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{14FA74F1-BB45-4061-B858-2B1367ED134C}|TutorManager.App\\TutorManager.App.csproj|c:\\users\\dell\\documents\\venkat\\my_project\\tutormanager\\tutormanager.app\\data\\db.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,26 +38,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "LogHoursForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\LogHoursForm.Designer.cs",
               "RelativeDocumentMoniker": "TutorManager.App\\UI\\LogHoursForm.Designer.cs",
-              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\LogHoursForm.Designer.cs*",
-              "RelativeToolTip": "TutorManager.App\\UI\\LogHoursForm.Designer.cs*",
-              "ViewState": "AgIAABkAAAAAAAAAAAAgwDwAAAAbAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\LogHoursForm.Designer.cs",
+              "RelativeToolTip": "TutorManager.App\\UI\\LogHoursForm.Designer.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAAAAEMAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-04T14:10:02.717Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "ReportForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\ReportForm.Designer.cs",
               "RelativeDocumentMoniker": "TutorManager.App\\UI\\ReportForm.Designer.cs",
               "ToolTip": "C:\\Users\\DELL\\Documents\\Venkat\\MY_PROJECT\\TutorManager\\TutorManager.App\\UI\\ReportForm.Designer.cs",
               "RelativeToolTip": "TutorManager.App\\UI\\ReportForm.Designer.cs",
-              "ViewState": "AgIAAMYAAAAAAAAAAAAWwOQAAAA9AAAAAAAAAA==",
+              "ViewState": "AgIAAOQAAAAAAAAAAAAWwAMBAADUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-04T13:52:21.586Z",
               "EditorCaption": ""
